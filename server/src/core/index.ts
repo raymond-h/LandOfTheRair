@@ -1,6 +1,33 @@
+import { worker } from 'cluster';
 
 require('dotenv').config();
 
+const path = require('path');
+const { Worker, isMainThread } = require('worker_threads');
+
+const isProd = process.env.NODE_ENV === 'production';
+const workerExt = isProd ? 'js' : 'ts';
+
+if (isMainThread) {
+
+  const workers: any = {
+    net: null,
+    gameloop: null
+  };
+
+  const pids: any = {
+    net: 0,
+    gameloop: 0
+  };
+
+  const netWorker = new Worker(path.join(__dirname, 'worker.js'), { workerData: { path: `${__dirname}/networking.${workerExt}` } });
+  const gameWorker = new Worker(path.join(__dirname, 'worker.js'), { workerData: { path: `${__dirname}/gameloop.${workerExt}` } });
+
+} else {
+
+}
+
+/*
 import 'reflect-metadata';
 
 import cluster from 'cluster';
@@ -91,3 +118,5 @@ if (cluster.isMaster) {
   if (process.env.GAMELOOP) gameStart();
 
 }
+
+*/
